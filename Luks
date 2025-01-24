@@ -1,0 +1,89 @@
+Here’s the complete list of commands for encrypting a file using LUKS based on the notes from the images:
+
+### Step 1: Identify the USB Device
+```bash
+lsblk
+```
+
+### Step 2: Create a Partition on the USB Device
+```bash
+sudo fdisk /dev/sdb
+```
+(Replace `/dev/sdb` with your USB device name.)
+
+Inside `fdisk`:
+- To list existing partitions:  
+  ```bash
+  p
+  ```
+- To delete existing partitions:  
+  ```bash
+  d
+  ```
+- To create a new partition:  
+  ```bash
+  n
+  ```
+  - Choose `p` for primary partition.  
+  - Choose partition number `1`.  
+  - Press `Enter` for default values.  
+  - Press `w` to save and exit.
+
+### Step 3: Encrypt the Partition with LUKS
+1. Install `cryptsetup` if not installed:
+   ```bash
+   sudo apt install cryptsetup
+   ```
+2. Initialize LUKS encryption on the partition:
+   ```bash
+   sudo cryptsetup luksFormat /dev/sdb
+   ```
+   (Replace `/dev/sdb` with the partition created above.)
+
+3. Open the encrypted partition:
+   ```bash
+   sudo cryptsetup luksOpen /dev/sdb encrypted_usb
+   ```
+
+4. Format the encrypted partition:
+   ```bash
+   sudo mkfs.ext4 /dev/mapper/encrypted_usb
+   ```
+
+### Step 4: Mount the Encrypted Partition
+1. Create a mount point:
+   ```bash
+   sudo mkdir /mnt/encrypted_usb
+   ```
+2. Mount the encrypted partition:
+   ```bash
+   sudo mount /dev/mapper/encrypted_usb /mnt/encrypted_usb
+   ```
+
+### Step 5: Unmount the Encrypted Partition
+1. Unmount:
+   ```bash
+   sudo umount /mnt/encrypted_usb
+   ```
+2. Close the encrypted partition:
+   ```bash
+   sudo cryptsetup luksClose encrypted_usb
+   ```
+
+### Step 6: Add Files to the Encrypted Partition
+1. Open the encrypted partition:
+   ```bash
+   sudo cryptsetup luksOpen /dev/sdb/ encrypted_usb
+   ```
+
+2. Mount it again:
+   ```bash
+   sudo mount /dev/mapper/encrypted_usb /mnt/encrypted_usb
+   ```
+
+3. Copy files:
+   ```bash
+   cp /home/kali/Desktop/1.jpg /mnt/encrypted_usb
+   ```
+
+This completes the steps to encrypt, mount, and add files to the encrypted USB partition. Let me know if you need help with any specific step.
